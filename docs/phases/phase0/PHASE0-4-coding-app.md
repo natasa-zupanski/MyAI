@@ -54,7 +54,7 @@ Prefer idiomatic, readable solutions. When asked to fix code, output only the co
 asked to explain. Default to [PRIMARY_LANGUAGE] unless specified otherwise.
 ```
 
-- [ ] **TODO:** Refine system prompt wording for MiniMax-M2.7 specifically (some models respond better to different prompt styles)
+- [ ] **TODO:** Refine system prompt wording for chosen model (some models respond better to different prompt styles)
 
 ---
 
@@ -66,7 +66,7 @@ asked to explain. Default to [PRIMARY_LANGUAGE] unless specified otherwise.
 | Preferred context window | 8,192–32,768 tokens |
 | Multi-file context | Not required at launch; add via RAG in Phase 3 |
 
-- [ ] **TODO:** Confirm MiniMax-M2.7 maximum context window from model card
+- [ ] **TODO:** Confirm chosen model's maximum context window from model card
 
 ---
 

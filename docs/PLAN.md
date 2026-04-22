@@ -2,7 +2,7 @@
 
 ## Overview
 
-Build a locally hosted AI platform using MiniMax-M2.7 as the base model, initially focused on coding assistance but architected to support additional applications (writing, research, document Q&A, automation, etc.) without rework.
+Build a locally hosted AI platform powered by an open-weights model (TBD — see [AIMODEL.md](phases/phase0/AIMODEL.md)), initially focused on coding assistance but architected to support additional applications (writing, research, document Q&A, automation, etc.) without rework.
 
 ---
 
@@ -12,9 +12,9 @@ Build a locally hosted AI platform using MiniMax-M2.7 as the base model, initial
 
 ### 0.1 Hardware & Infrastructure Requirements
 - [ ] Document available hardware (CPU, RAM, GPU model, VRAM)
-- [ ] Determine whether MiniMax-M2.7 fits in VRAM or requires CPU offloading / quantization
-- [ ] Decide on quantization level (fp16, int8, int4) based on hardware limits
-- [ ] Confirm storage capacity for model weights (MiniMax-M2.7 is ~15–20GB+ depending on quant)
+- [ ] Select base model (see AIMODEL.md for candidates evaluated against hardware constraints)
+- [ ] Decide on quantization level (fp16, int8, int4) based on hardware limits and chosen model
+- [ ] Confirm storage capacity for model weights of chosen model
 - [ ] Decide whether the service needs to run 24/7 or on-demand
 
 ### 0.2 Model Serving Requirements
@@ -53,9 +53,9 @@ Build a locally hosted AI platform using MiniMax-M2.7 as the base model, initial
 
 ## Phase 1 — Model & Serving Layer
 
-**Goal:** Get MiniMax-M2.7 running locally with a stable, OpenAI-compatible API endpoint.
+**Goal:** Get chosen model running locally with a stable, OpenAI-compatible API endpoint.
 
-- [ ] Download MiniMax-M2.7 weights (HuggingFace or official release)
+- [ ] Download chosen model weights (HuggingFace or official release)
 - [ ] Convert to serving format if needed (GGUF for llama.cpp, or use HF directly with vLLM)
 - [ ] Configure chosen serving backend with appropriate quantization
 - [ ] Expose `http://localhost:8000` OpenAI-compatible API
@@ -129,7 +129,7 @@ Each new application is a new file in `apps/` plus any app-specific tooling.
                             ▼
 ┌────────────────────────────────────────────────────┐
 │           Model Server  (:8000)                    │
-│         MiniMax-M2.7  (vLLM / llama.cpp)           │
+│         Chosen model  (backend TBD)                 │
 │         OpenAI-compatible REST API                 │
 └────────────────────────────────────────────────────┘
 ```

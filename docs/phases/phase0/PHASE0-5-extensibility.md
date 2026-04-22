@@ -63,7 +63,7 @@ If `app` is omitted, a default app is used (configured in `config.yaml`).
 
 ## Tool / Function Calling Strategy
 
-MiniMax-M2.7 supports function calling. Tools can be defined per-app in the YAML and forwarded to the model server.
+The chosen model's function calling support will be confirmed once the base model is selected. Tools can be defined per-app in the YAML and forwarded to the model server.
 
 Built-in tools to consider for future apps:
 | Tool | Used By |
@@ -73,7 +73,7 @@ Built-in tools to consider for future apps:
 | `web_search` | research |
 | `run_shell_command` | shell (sandboxed) |
 
-- [ ] **TODO:** Confirm MiniMax-M2.7 function calling support and format from model card
+- [ ] **TODO:** Confirm chosen model's function calling support and format from model card
 - [ ] **TODO:** Decide whether tools are called by the model and executed by the platform, or passed through to the client
 
 ---

@@ -1,6 +1,6 @@
 # MyAI
 
-A locally hosted AI platform built on [MiniMax-M2.7](https://huggingface.co/MiniMaxAI). All inference runs on-device — no data leaves the machine.
+A locally hosted AI platform powered by an open-weights model running fully on-device — no data leaves the machine. Base model TBD (see [docs/phases/phase0/AIMODEL.md](docs/phases/phase0/AIMODEL.md)).
 
 ## Purpose
 

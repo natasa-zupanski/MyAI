@@ -61,7 +61,7 @@ vLLM is **not recommended** for this hardware unless the model is confirmed to f
 
 ## Checklist
 
-- [ ] MiniMax-M2.7 GGUF availability confirmed (check HuggingFace for community GGUF conversion or official release)
+- [ ] Chosen model GGUF availability confirmed (check HuggingFace for official or community GGUF)
 - [ ] Serving backend selected based on model size vs. VRAM
 - [ ] Decide: build llama.cpp from source (CUDA support) or use prebuilt binary
 - [ ] Decide: number of GPU layers to offload (`--n-gpu-layers` in llama.cpp)
