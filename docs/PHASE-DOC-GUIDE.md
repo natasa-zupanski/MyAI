@@ -52,9 +52,10 @@ Add new files as needed. One file per topic; keep names short and lowercase.
 
 ### How to reference private files from public phase docs
 
-- In the public phase doc, replace specific private details with a summary line (e.g., "4 GB VRAM — see private file") and a link: `[docs/private/hardware.md](../../private/hardware.md)`
+- In the public phase doc, replace specific private details with a summary line (e.g., "sufficient for CPU offloading — see private/hardware.md") and a link: `[docs/private/hardware.md](../../private/hardware.md)`
 - Never copy private values back into a public doc, even in comments
 - The private file is the single source of truth for that data; the public doc references it
+- **Exception:** a value that is itself a hard architectural constraint (e.g., 4 GB VRAM drives the entire serving decision) may be named in the public doc because the reasoning is unintelligible without it. All other specs stay private.
 
 ### When working with Claude Code
 
