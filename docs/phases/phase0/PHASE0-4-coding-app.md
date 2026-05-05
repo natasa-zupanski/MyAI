@@ -1,6 +1,6 @@
 # Phase 0-4 — Coding Application Requirements
 
-## Status: Pending
+## Status: Complete
 
 ---
 
@@ -9,12 +9,12 @@
 Define which coding tasks the assistant must handle at launch vs. nice-to-have later.
 
 ### Must Have (v1)
-- [ ] **Code completion** — suggest next lines or complete a function given context
-- [ ] **Inline chat** — ask questions about selected code in the editor
-- [ ] **Code explanation** — explain what a block of code does in plain language
-- [ ] **Refactoring suggestions** — improve readability, performance, or style
-- [ ] **Debugging help** — explain an error, suggest a fix given stack trace + code
-- [ ] **Docstring / comment generation** — generate function/class documentation
+- [x] **Code completion** — suggest next lines or complete a function given context
+- [x] **Inline chat** — ask questions about selected code in the editor
+- [x] **Code explanation** — explain what a block of code does in plain language
+- [x] **Refactoring suggestions** — improve readability, performance, or style
+- [x] **Debugging help** — explain an error, suggest a fix given stack trace + code
+- [x] **Docstring / comment generation** — generate function/class documentation
 
 ### Nice to Have (v1.5+)
 - [ ] **Test generation** — write unit tests for a given function
@@ -26,15 +26,20 @@ Define which coding tasks the assistant must handle at launch vs. nice-to-have l
 
 ## Target Languages & Frameworks
 
-- [ ] **TODO:** List the primary languages and frameworks used in your projects
+Primary languages to prioritize in system prompt and context:
 
-Defaults to prioritize in system prompt:
 - Python
 - TypeScript / JavaScript
+- Java
+- C#
+- Go
+- Rust
+
+Supporting (included but lower priority):
 - Bash / Shell
 - SQL
 
-Add others as needed (Go, Rust, C#, etc.).
+Frameworks deferred — add to system prompt as specific projects require them.
 
 ---
 
@@ -49,12 +54,19 @@ The coding app system prompt should:
 
 Draft system prompt (refine in Phase 3):
 ```
-You are a coding assistant. Be concise. Output code directly without lengthy explanation unless asked.
-Prefer idiomatic, readable solutions. When asked to fix code, output only the corrected code unless
-asked to explain. Default to [PRIMARY_LANGUAGE] unless specified otherwise.
+You are a coding assistant. Before writing code, ask clarifying questions if the request is ambiguous,
+then briefly state your plan before implementing. Write readable, clean code. Avoid clever one-liners
+at the expense of clarity. Add comments only when the logic is non-obvious. Output only the relevant
+code unless asked to explain. Default to the language of the surrounding context unless specified otherwise.
 ```
 
-- [ ] **TODO:** Refine system prompt wording for chosen model (some models respond better to different prompt styles)
+Key behaviors locked for v1:
+- Ask clarifying questions before coding if the request is ambiguous
+- State a short plan before implementing
+- Readable and clean code; no style preferences beyond that
+- No comments unless logic is non-obvious
+
+Refine wording for Qwen2.5-Coder-7B-Instruct response style in Phase 3.
 
 ---
 
@@ -66,7 +78,7 @@ asked to explain. Default to [PRIMARY_LANGUAGE] unless specified otherwise.
 | Preferred context window | 8,192–32,768 tokens |
 | Multi-file context | Not required at launch; add via RAG in Phase 3 |
 
-- [ ] **TODO:** Confirm chosen model's maximum context window from model card
+Qwen2.5-Coder-7B-Instruct supports up to 128k tokens. Runtime context window is set to 16384 by default (configurable) — confirmed in [PHASE0-2-serving.md](PHASE0-2-serving.md).
 
 ---
 
@@ -78,17 +90,17 @@ For project-aware suggestions (e.g., "use the existing `UserService` pattern"), 
 - Embedding model: **sentence-transformers** (runs locally, CPU)
 - Trigger: per-project, index on first open or on file change
 
-- [ ] **TODO:** Decide whether RAG is needed at launch or deferred to Phase 3
+**Decision: deferred to Phase 3.** Performance without RAG needs to be explored first — the 16384-token context window covers single-file and manually pasted multi-file context at launch. Revisit once real usage patterns are clearer.
 
 ---
 
 ## Checklist
 
-- [ ] Supported tasks list confirmed
-- [ ] Target languages defined
-- [ ] System prompt drafted
-- [ ] Context window requirement confirmed against model capability
-- [ ] RAG decision made (launch vs. defer)
+- [x] Supported tasks list confirmed (v1 must-haves locked; nice-to-haves deferred)
+- [x] Target languages defined: Python, TS/JS, Java, C#, Go, Rust (primary); Bash, SQL (supporting)
+- [x] System prompt drafted: clarify → plan → implement; readable clean code; no unnecessary comments
+- [x] Context window confirmed: 128k max (model); 16384 default runtime (see PHASE0-2)
+- [x] RAG deferred to Phase 3 — explore performance without it first
 
 ---
 
@@ -96,10 +108,12 @@ For project-aware suggestions (e.g., "use the existing `UserService` pattern"), 
 
 | Decision | Choice | Notes |
 |---|---|---|
-| Target languages | TBD | |
-| System prompt | TBD | Draft above, finalize in Phase 3 |
-| Context window | TBD | |
-| RAG at launch | TBD | |
+| Target languages | Python, TS/JS, Java, C#, Go, Rust | Bash and SQL as supporting; frameworks added per project |
+| System prompt behavior | Clarify → plan → implement | Ask before coding if ambiguous; state plan before implementing |
+| Code style | Readable and clean; no comments unless non-obvious | No further style preferences at this stage |
+| System prompt wording | Draft locked; refine in Phase 3 | Tune wording for Qwen2.5-Coder-7B-Instruct response style |
+| Context window | 16384 default (runtime-configurable) | Model supports 128k; runtime limit set in PHASE0-2 |
+| RAG at launch | Deferred to Phase 3 | Explore performance without RAG first |
 
 ---
 
