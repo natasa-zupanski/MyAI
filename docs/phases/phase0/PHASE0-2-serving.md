@@ -1,6 +1,6 @@
 # Phase 0-2 — Model Serving Backend Requirements
 
-## Status: Pending (blocked on PHASE0-1 hardware decisions)
+## Status: Complete
 
 ---
 
@@ -48,25 +48,26 @@
 
 ---
 
-## Recommendation (pending hardware confirmation)
+## Recommendation
 
-Given the Quadro T1000 Max-Q (4 GB VRAM):
+Given the Quadro T1000 Max-Q (4 GB VRAM) and Qwen2.5-Coder-7B-Instruct (~4.5 GB Q4_K_M):
 
-- **Primary recommendation: llama.cpp / llama-server** — maximum control over layer offloading, runs headless, scriptable, OpenAI-compatible, best option when model exceeds VRAM
-- **Fallback: Ollama** — if ease of setup is prioritized and llama.cpp build proves difficult on Windows
+- **Selected: llama.cpp / llama-server** — prebuilt CUDA binary; layer split handles the ~0.5 GB VRAM overflow transparently; OpenAI-compatible API; scriptable for dynamic model switching
+- Context window set to 16384 by default; application layer controls this at server start time
+- Dynamic model switching is handled at the application layer: stop the server, start a new instance with a different `--model` path
 
-vLLM is **not recommended** for this hardware unless the model is confirmed to fit entirely within 4 GB.
+vLLM is ruled out (no CPU offloading). Ollama was considered but llama.cpp was preferred for control over exact quantization and GPU layer configuration.
 
 ---
 
 ## Checklist
 
-- [ ] Chosen model GGUF availability confirmed (check HuggingFace for official or community GGUF)
-- [ ] Serving backend selected based on model size vs. VRAM
-- [ ] Decide: build llama.cpp from source (CUDA support) or use prebuilt binary
-- [ ] Decide: number of GPU layers to offload (`--n-gpu-layers` in llama.cpp)
-- [ ] Decide: context window size (`--ctx-size`; larger = more RAM/VRAM needed)
-- [ ] Decide: target port for model server (default: `8000`)
+- [x] Chosen model GGUF availability confirmed: Qwen2.5-Coder-7B-Instruct — community GGUF builds available on HuggingFace (Bartowski; Q4_K_M available)
+- [x] Serving backend selected: llama.cpp / llama-server
+- [x] Prebuilt binary with CUDA support (GitHub releases — no build from source required)
+- [x] GPU layers: starting estimate ~28/32 layers on GPU (~3.9 GB VRAM); tune empirically during Phase 1 benchmarking
+- [x] Context window: 16384 default; configurable at runtime via `--ctx-size` (set by application layer — not hardcoded)
+- [x] Server port: 8000 (change if conflict found)
 
 ---
 
@@ -74,11 +75,13 @@ vLLM is **not recommended** for this hardware unless the model is confirmed to f
 
 | Decision | Choice | Notes |
 |---|---|---|
-| Serving backend | TBD | |
-| Model format | TBD | GGUF preferred for llama.cpp/Ollama |
-| GPU layers | TBD | Set after benchmarking VRAM usage |
-| Context window | TBD | 4096 minimum for coding; 8192+ preferred |
-| Server port | 8000 | Unless conflict found |
+| Serving backend | llama.cpp / llama-server | Maximum control over layer offloading; OpenAI-compatible API; headless and scriptable |
+| Installation method | Prebuilt binary (GitHub releases) | CUDA-enabled build; no compile step required |
+| Model format | GGUF Q4_K_M | Single file; handled natively by llama.cpp; Bartowski builds available |
+| GPU layers | ~28/32 starting point | Tune empirically in Phase 1; target ~3.9 GB VRAM leaving headroom for KV cache |
+| Context window | 16384 default; runtime-configurable | Application layer passes `--ctx-size` at server start; not hardcoded |
+| Server port | 8000 | Change if conflict found |
+| Dynamic model switching | Application-layer restart | llama-server serves one model at a time; switching requires stop/start with new `--model` path — application layer manages this |
 
 ---
 
