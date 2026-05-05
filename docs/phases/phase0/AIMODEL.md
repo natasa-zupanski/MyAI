@@ -28,6 +28,7 @@ For more detail on hardware constraints, see [PHASE0-1-hardware.md](PHASE0-1-har
 |---|---|---|---|---|---|---|
 | NVIDIA Nemotron-3-Nano-4B | 3.97B | Mamba-2/Transformer hybrid | ~2 GB | VRAM (comfortable) | — (edge-focused) | NVIDIA Nemotron Open |
 | Qwen3.5 4B | 4B | Dense | ~2 GB | VRAM (comfortable) | 27/100 | Apache 2.0 |
+| **Qwen2.5-Coder-7B-Instruct** | **7.61B** | **Dense** | **~4.5 GB** | **Minor CPU offload** | **— (coding-specialized)** | **Apache 2.0** |
 | Ministral 8B | 8B | Dense | ~4 GB | VRAM (full) | 15/100 | MistralAI Research |
 | Qwen3.5 9B | 9.7B | Dense | ~5 GB | Minor CPU offload | 32/100 | Apache 2.0 |
 | Qwen3.5 27B | 27.8B | Dense | ~14 GB | CPU offload | 42/100 | Apache 2.0 |
@@ -68,6 +69,33 @@ For more detail on hardware constraints, see [PHASE0-1-hardware.md](PHASE0-1-har
 - Mamba-2 hybrid is more memory-efficient than pure transformer for long contexts
 - NVIDIA Nemotron license is not as permissive as Apache 2.0; review before commercial redistribution
 - Tool calling supported natively
+
+---
+
+### Qwen2.5-Coder-7B-Instruct ✅ Minor CPU offload — **Selected starting model**
+- **HuggingFace:** https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct
+- **Parameters:** 7.61B dense
+- **Context window:** 128k tokens
+- **Q4_K_M size:** ~4.5 GB → ~0.5 GB spills to RAM via CPU offload
+- **License:** Apache 2.0
+- **Reasoning:** No dedicated reasoning mode; strong chain-of-thought on code tasks
+- **Coding:** Purpose-built coding specialist — trained on code, math, and general text with emphasis on code generation, debugging, and explanation
+
+**Benchmark highlights (coding-focused):**
+
+| Benchmark | Score | Notes |
+|---|---|---|
+| HumanEval | ~88 | Code generation |
+| MBPP | ~79 | Python programming problems |
+| LiveCodeBench | Competitive | Real-world coding evaluation |
+| MultiPL-E | Strong | Multi-language code generation |
+
+**Notes:**
+- Coding-specialized variant of Qwen2.5; outperforms general Qwen3.5 9B on coding tasks at a smaller memory footprint
+- Well-suited as the default model for a local coding agent
+- Dynamic model switching planned — can swap to Qwen3.5 27B for complex reasoning tasks; see serving backend selection in [PHASE0-2-serving.md](PHASE0-2-serving.md)
+- Quantizations available via llama.cpp / Ollama / LM Studio community builds
+- Apache 2.0 — no redistribution restrictions
 
 ---
 
@@ -134,21 +162,22 @@ For more detail on hardware constraints, see [PHASE0-1-hardware.md](PHASE0-1-har
 
 ## To Investigate
 
-| Model | Reason |
-|---|---|
-| Qwen2.5-Coder-7B / 14B | Coding-specialized variant of the Qwen family; likely outperforms general Qwen3.5 9B on coding tasks at similar memory footprint |
-| Qwen2.5-Coder-32B | Largest coding-specialist that might fit with CPU offload (~16 GB Q4_K_M) |
-| DeepSeek-Coder-V2-Lite (16B A2.4B MoE) | Coding-focused MoE; active params keep inference fast |
+| Model | Reason | Status |
+|---|---|---|
+| ~~Qwen2.5-Coder-7B~~ | ~~Coding-specialized; outperforms general Qwen3.5 9B on coding tasks~~ | **Selected — see profile above** |
+| Qwen2.5-Coder-14B | Larger coding-specialist; ~8 GB Q4_K_M — needs CPU offload but may offer quality lift | Not yet evaluated |
+| Qwen2.5-Coder-32B | Largest coding-specialist; ~16 GB Q4_K_M — heavy CPU offload | Not yet evaluated |
+| DeepSeek-Coder-V2-Lite (16B A2.4B MoE) | Coding-focused MoE; active params keep inference fast | Not yet evaluated |
 
 ---
 
 ## Summary Recommendation
 
-| Priority | Model | Reason |
-|---|---|---|
-| Fits in VRAM, edge-optimized | Nemotron-3-Nano-4B | Designed for exactly this hardware class; controllable reasoning; tool calling |
-| Best quality/fit balance | Qwen3.5 9B | Strong general + coding quality; Apache 2.0; minor CPU offload |
-| Best raw quality that fits | Qwen3.5 27B | Highest intelligence score in range; needs CPU offload |
-| Investigate further | Qwen2.5-Coder-7B | May outperform all of the above specifically on coding tasks |
+| Priority | Model | Reason | Status |
+|---|---|---|---|
+| **Default / starting model** | **Qwen2.5-Coder-7B-Instruct** | **Coding-specialist; fits with minor CPU offload; Apache 2.0** | **Selected** |
+| Heavy reasoning / complex tasks | Qwen3.5 27B | Highest quality that fits; swap in dynamically | Available for dynamic use |
+| Fallback (VRAM-only) | Nemotron-3-Nano-4B | Fits fully in VRAM; designed for edge hardware | Available if needed |
+| Investigate | Qwen2.5-Coder-14B / 32B | Larger coding specialists; may offer quality lift with CPU offload | Not yet evaluated |
 
-Final model selection is a **decision for Phase 0-1** and blocks all downstream phases.
+**Dynamic model switching** is a first-class requirement: the serving backend (see [PHASE0-2-serving.md](PHASE0-2-serving.md)) must support loading and unloading models at runtime. Qwen2.5-Coder-7B-Instruct is the default; other models from this table can be loaded on demand.

@@ -1,6 +1,6 @@
 # Phase 0-1 — Hardware & Infrastructure Requirements
 
-## Status: In Progress
+## Status: Complete
 
 ---
 
@@ -71,19 +71,19 @@ See **[AIMODEL.md](AIMODEL.md)** for the full model evaluation, feasibility anal
 - [x] System RAM confirmed (see private/hardware.md)
 - [x] Available disk space confirmed (see private/hardware.md)
 - [x] CPU model confirmed (see private/hardware.md)
-- [ ] **BLOCKER:** Base model selected (see AIMODEL.md for candidates)
+- [x] Base model selected: Qwen2.5-Coder-7B-Instruct (starting model; dynamic switching to other candidates planned — see AIMODEL.md)
 
 ---
 
-## Key Decisions (fill in after checklist is complete)
+## Key Decisions
 
 | Decision | Choice | Notes |
 |---|---|---|
-| Base model | TBD — **BLOCKER** | Must be selected before all other decisions; see AIMODEL.md |
-| Primary inference device | TBD | Depends on model and hardware decision above |
-| Quantization level | TBD | Depends on model decision above |
-| CPU offloading | TBD | Depends on model decision above |
-| Run mode | TBD | On-demand vs. persistent background service |
+| Base model | Qwen2.5-Coder-7B-Instruct | Starting model; dynamic switching to other models is a first-class requirement — see AIMODEL.md |
+| Primary inference device | GPU (4 GB VRAM) + minor CPU offload | ~4.5 GB Q4_K_M; ~0.5 GB spills to RAM — trivial on 16 GB |
+| Quantization level | Q4_K_M | Balances quality and memory; ~0.5 bytes/param rule of thumb |
+| CPU offloading | Yes — minor | ~0.5 GB overflow; llama.cpp layer splitting handles this automatically |
+| Run mode | Deferred to PHASE0-2 | On-demand vs. persistent background service — see [PHASE0-2-serving.md](PHASE0-2-serving.md) |
 
 ---
 
